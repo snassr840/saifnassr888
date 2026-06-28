@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>شركة سهم بلدي - للمقاولات</title>
+  <style>
+    :root{
+      --white:#ffffff;
+      --red:#0284c7;
+      --sky:#38bdf8;
+      --sky-light:#e0f7ff;
+      --sky-soft:#f0fbff;
+      --gold:#d4af37;
+      --black:#0b0b0b;
+      --muted:#7a7a7a;
+      --panel: rgba(255,255,255,0.96);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Tahoma,Segoe UI,Arial;background:var(--sky-light);color:var(--black);direction:rtl}
+    header{display:flex;align-items:center;gap:18px;padding:18px 24px;background:linear-gradient(90deg,#fff,var(--sky-soft));border-bottom:4px solid var(--sky)}
+    .logo {display:flex;align-items:center;gap:12px}
+    .logo img{width:120px;height:auto}
+    .brand{font-weight:800;font-size:1.5rem;color:var(--red)}
+    .tag{color:var(--muted);font-size:0.95rem}
+
+    .container{max-width:1280px;margin:28px auto;padding:0 18px}
+
+    /* Welcome overlay */
+    .welcome-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(11,11,11,0.6),rgba(11,11,11,0.7));display:flex;align-items:center;justify-content:center;z-index:9999}
+    .welcome-box{background:var(--panel);padding:28px;border-radius:18px;max-width:560px;width:92%;text-align:center}
+    .welcome-box h1{margin:0 0 8px;color:var(--red);font-size:1.8rem}
+    .welcome-box p{margin:0 0 18px;color:var(--muted)}
+    .welcome-box button{background:var(--gold);border:none;padding:12px 18px;border-radius:12px;font-weight:700;cursor:pointer}
+
+    /* Sections */
+    .sections{display:grid;gap:18px;margin-top:20px}
+    .section{background:#fff;border:1px solid #c7ecfb;border-radius:12px;padding:18px;box-shadow:0 10px 24px rgba(2,132,199,0.12)}
+    .section h2{margin:0 0 8px;color:var(--red)}
+    .section p{margin:0 0 12px;color:var(--muted);line-height:1.6}
+
+    .projects{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+    .project{border-radius:10px;padding:12px;background:linear-gradient(180deg,#fff, var(--sky-soft));border:1px solid #c7ecfb}
+    .project h4{margin:0 0 6px;color:var(--black)}
+    .project p{margin:0 0 8px;color:var(--muted);font-size:0.95rem}
+    .project .contract-name{color:#075985;font-weight:800;line-height:1.7}
+    .project .call{display:inline-block;background:var(--red);color:#fff;padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:700}
+    .contract-panels{margin-top:16px}
+    .project-details{display:none;margin-top:12px}
+    .project-details.is-open{display:block}
+    .contract-details{width:100%;border:1px solid #7dd3fc;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 14px 32px rgba(2,132,199,0.12)}
+    .contract-details h3{margin:0;padding:14px 16px;background:var(--sky);color:#083344;font-size:1.08rem}
+    .table-wrap{overflow-x:auto}
+    .contract-table{width:100%;border-collapse:collapse;min-width:1040px}
+    .contract-table th,.contract-table td{padding:10px 12px;border:1px solid #7aaec2;text-align:right;vertical-align:middle}
+    .contract-table th{background:#e0f2fe;color:#083344;font-weight:800}
+    .contract-table td{color:var(--black);background:#fff}
+    .contract-table td[contenteditable="true"]{outline:2px solid transparent}
+    .contract-table td[contenteditable="true"]:focus{outline-color:var(--sky);background:#f0fbff}
+    .contract-table .serial{width:55px;text-align:center;font-weight:800}
+    .contract-table .description{min-width:420px}
+    .contract-table .number,.contract-table .amount,.contract-table .notes{text-align:center;white-space:nowrap}
+    .contract-table .total td{font-weight:800;background:#e0f2fe}
+    .contract-table .total td[contenteditable="false"]{cursor:default}
+    .contract-table .project-info-row td{background:#f0fbff;color:#075985;font-weight:700}
+    .contract-table .project-info-row td:first-child{width:34%}
+    .key-table{min-width:680px}
+    .key-table .serial{width:60px}
+    .key-table .description{min-width:230px}
+    .key-table .value{min-width:180px;text-align:center;direction:ltr}
+    .project-attachments{margin:18px 16px 16px;padding:14px;border:1px dashed #7dd3fc;border-radius:10px;background:var(--sky-soft)}
+    .project-attachments h4{margin:0 0 10px;color:#075985}
+    .pdf-upload-label{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:var(--red);color:#fff;font-weight:700;cursor:pointer}
+    .pdf-upload-label input{display:none}
+    .pdf-list{display:grid;gap:12px;margin-top:12px}
+    .pdf-preview{padding:10px;border-radius:8px;background:#fff;border:1px solid #bae6fd}
+    .pdf-preview__head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;font-weight:700}
+    .pdf-preview button{border:0;border-radius:6px;padding:5px 9px;background:#fee2e2;color:#991b1b;cursor:pointer;font:inherit}
+    .pdf-preview embed{display:block;width:100%;height:420px;border:1px solid #cbd5e1;border-radius:6px}
+    .special-project-name{outline:2px dashed transparent;outline-offset:4px;border-radius:4px;cursor:text}
+    .special-project-name:focus{outline-color:var(--sky);background:var(--sky-soft)}
+
+    .number-confirmation{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.55);z-index:11000}
+    .number-confirmation.is-open{display:flex}
+    .number-confirmation__box{width:min(360px,100%);padding:24px;border-radius:14px;background:#fff;color:var(--black);text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .number-confirmation__box p{margin:0 0 18px;font-size:1.1rem;font-weight:800}
+    .number-confirmation__actions{display:flex;justify-content:center;gap:10px}
+    .number-confirmation__actions button{border:0;border-radius:8px;padding:9px 24px;font:inherit;font-weight:800;cursor:pointer}
+    #confirmNumberYes{background:var(--red);color:#fff}
+    #confirmNumberNo{background:#e5e7eb;color:var(--black)}
+
+    /* Modal for project details */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:10000}
+    .modal{background:#fff;border-radius:12px;max-width:720px;width:92%;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,0.3);direction:rtl}
+    .modal h3{margin:0 0 8px;color:var(--red)}
+    .modal .close{position:absolute;top:14px;left:18px;background:transparent;border:none;font-size:20px;cursor:pointer}
+    .modal .content{color:var(--muted);line-height:1.6}
+
+    footer{margin-top:28px;padding:20px;text-align:center;color:var(--muted);border-top:1px solid #eee}
+
+    @media (max-width:720px){.logo img{width:90px}.brand{font-size:1.2rem}}
+  </style>
+</head>
+<body>
+
+  <div class="welcome-overlay" id="welcomeOverlay">
+    <div class="welcome-box">
+      <h1>أهلا وسهلا — شركة سهم بلدي ترحب بك</h1>
+      <p>مرحبًا! يمكنك المتابعة لعرض خدماتنا ومشاريعنا.</p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button id="enterSite" style="background:var(--gold);border:none;padding:10px 14px;border-radius:10px;cursor:pointer">دخول الموقع</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="logo">
+    <img src="sahm-logo.jpg" alt="شعار شركة سهم بلدي" onerror="this.onerror=null;this.src='image.HTML.jpg'" />
+      <div>
+        <div class="brand">شركة سهم بلدي للمقاولات</div>
+        <div class="tag">شركة متخصصة في أعمال البنية التحتية لشبكات الكهرباء الأرضية حتى جهد 132 كيلو فولت وإنشاء وصيانة الخطوط الهوائية والكابلات الأرضية والمحطات حتى جهد 36 كيلو فولت</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="sections">
+      <div class="section">
+        <h2>العقد الموحد</h2>
+        <p>تركيب وازالة واستبدال وتعديل وصيانة شبكات التوزيع الهوائية والارضية ذات الجهد المنخفض والمتوسط حتى جهد 36 كيلو فولت وتنفيذ عمليات التشغيل على الجهد المنخفض لاصدار تصاريح العمل للجهد المنخفض.</p>
+        <div class="projects">
+          <div class="project">
+            <h4>مشروع إدارة كهرباء مدينة الرياض</h4>
+            <p class="contract-name">مشروع العقد الموحد والبنية التحتية لشبكات التوزيع والطاقة عقود أعوام (2021، 2026)</p>
+            <a class="call details" href="#" data-detail="riyadh">تفاصيل المشروع</a>
+          </div>
+          <div class="project">
+            <h4>مشروع إدارة كهرباء المدينة المنورة</h4>
+            <p class="contract-name">مشروع العقد الموحد والبنية التحتية لشبكات التوزيع والطاقة عقود أعوام (2021، 2026)</p>
+            <a class="call details" href="#" data-detail="madinah">تفاصيل المشروع</a>
+          </div>
+          <div class="project">
+            <h4>مشروع إدارة كهرباء محافظة الخرج</h4>
+            <p class="contract-name">مشروع العقد الموحد والبنية التحتية لشبكات التوزيع والطاقة عقود أعوام (2021، 2026)</p>
+            <a class="call details" href="#" data-detail="kharj">تفاصيل المشروع</a>
+          </div>
+        </div>
+        <div class="contract-panels">
+          <div class="project-details" data-contract-detail="riyadh"></div>
+          <div class="project-details" data-contract-detail="madinah"></div>
+          <div class="project-details" data-contract-detail="kharj"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>تسليم المفتاح</h2>
+        <p>خدمة تسليم المفتاح تشمل التصميم، التنفيذ، التجهيز الكامل، والاختبارات النهائية حتى يصبح المشروع جاهزًا للتشغيل بدون أي عبء على العميل.</p>
+        <div class="projects">
+          <div class="project">
+            <h4>مشروع هوائي أبو عجرم</h4>
+            <p>تنفيذ أعمال كهربائية وتسليم المفتاح لهوائي أبو عجرم بكامل التجهيزات.</p>
+            <a class="call details" href="#" data-key-detail="abu-ajram">تفاصيل المشروع</a>
+          </div>
+          <div class="project">
+            <h4>مشروع إنشاء محطة الحريق</h4>
+            <p>إنجاز كامل لمحطة الحريق من التركيبات الكهربائية وأنظمة الإنذار والمراقبة.</p>
+            <a class="call details" href="#" data-key-detail="fire-station">تفاصيل المشروع</a>
+          </div>
+          <div class="project">
+            <h4>مشروع استبدال كابلات الديوان 132 كيلوفولت</h4>
+            <p>استبدال كابلات الجهد العالي 132 كيلوفولت لمبنى الديوان مع ضمان الجودة والسلامة.</p>
+            <a class="call details" href="#" data-key-detail="diwan-cables">تفاصيل المشروع</a>
+          </div>
+        </div>
+        <div class="contract-panels">
+          <div class="project-details" data-key-project-detail="abu-ajram"></div>
+          <div class="project-details" data-key-project-detail="fire-station"></div>
+          <div class="project-details" data-key-project-detail="diwan-cables"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>المشاريع الخاصة</h2>
+        <p>نقوم بتوريد وتنفيذ وصيانة الشبكات الكهربائية والاتصالات والإنارة.</p>
+        <div class="projects">
+          <div class="project">
+            <h4 class="special-project-name" contenteditable="true" data-special-project="1">مشروع................</h4>
+            <p>اكتب وصف المشروع هنا.</p>
+            <a class="call" href="#">تفاصيل المشروع</a>
+          </div>
+          <div class="project">
+            <h4 class="special-project-name" contenteditable="true" data-special-project="2">مشروع................</h4>
+            <p>اكتب وصف المشروع هنا.</p>
+            <a class="call" href="#">تفاصيل المشروع</a>
+          </div>
+          <div class="project">
+            <h4 class="special-project-name" contenteditable="true" data-special-project="3">مشروع................</h4>
+            <p>اكتب وصف المشروع هنا.</p>
+            <a class="call" href="#">تفاصيل المشروع</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div style="font-weight:700;color:var(--black)">شركة سهم بلدي للمقاولات</div>
+    </footer>
+  </main>
+
+  <div class="number-confirmation" id="numberConfirmation" role="dialog" aria-modal="true" aria-labelledby="numberConfirmationText">
+    <div class="number-confirmation__box">
+      <p id="numberConfirmationText">هل تريد التغير؟</p>
+      <div class="number-confirmation__actions">
+        <button type="button" id="confirmNumberYes">نعم</button>
+        <button type="button" id="confirmNumberNo">لا</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Hide welcome overlay when entering
+    document.getElementById('enterSite').addEventListener('click', () => {
+      document.getElementById('welcomeOverlay').style.display = 'none';
+      sessionStorage.setItem('sahmVisited','1');
+    });
+
+    // If user previously accepted, hide overlay by session
+    if(sessionStorage.getItem('sahmVisited')){
+      document.getElementById('welcomeOverlay').style.display = 'none';
+    }
+
+    const contractRows = [
+      ['1', 'اوامر عمل تم الاستلام من الكهرباء-تحت التنفيذ', '1', '2,000,000.00', '8', '3,000,000.00', ''],
+      ['2', 'اوامر عمل تم التنفيذ وجارى تسليم 155', '2', '500,000.00', '9', '876,756.00', ''],
+      ['3', 'اوامر عمل تم تسليم 155 وجارى دخولها مستخلص جزئى', '4', '575,677.00', '6', '9,786,756.00', ''],
+      ['4', 'اوامر عمل دخلت مستخلص جزئى وجارى الصرف', '7', '6,556.00', '5', '86,645.00', ''],
+      ['5', 'اوامر عمل دخلت مستخلص جزئى وتم الصرف', '8', '86,533.00', '7', '7,675.00', ''],
+      ['6', 'اوامر عمل دخلت مستخلص نهائى او كلى و جارى الصرف', '9', '7,643,678.00', '3', '65,645.00', ''],
+      ['7', 'اوامر عمل دخلت مستخلص نهائى او كلى وتم الصرف', '5', '878,786.00', '5', '8,767.00', ''],
+      ['8', 'اوامر عمل عليها معوقات', '4', '7,665.00', '3', '544.00', ''],
+      ['', 'الاجمالى', '40', '11,698,895.00', '46', '13,832,788.00', '']
+    ];
+
+    const projectNames = {
+      riyadh: 'مشروع إدارة كهرباء مدينة الرياض',
+      madinah: 'مشروع إدارة كهرباء المدينة المنورة',
+      kharj: 'مشروع إدارة كهرباء محافظة الخرج'
+    };
+
+    const keyDeliveryRows = [
+      ['1', 'رقم العقد', '44000000', ''],
+      ['2', 'رقم المنافسة', 'RFX4000000', ''],
+      ['3', 'قيمة العقد', '22000000', ''],
+      ['4', 'تاريخ توقيع العقد', '10/01/25', ''],
+      ['5', 'تاريخ الإنجاز الفني (tcc)', '10/01/26', ''],
+      ['6', 'تاريخ التسليم الابتدائي (pac)', '10/01/27', ''],
+      ['7', 'تاريخ التسليم النهائي (fac)', '10/01/28', ''],
+      ['8', 'قيمة أمر التغير', '5000000', ''],
+      ['9', 'الإيراد المفوتر', '4000000', ''],
+      ['10', 'الإيراد المستحق', '1000000', ''],
+      ['12', 'المعوقات', '', '']
+    ];
+
+    const keyDeliveryProjectInfoRows = [
+      ['اسم العميل', 'الشركة السعودية للطاقة (النقل)'],
+      ['اسم الاستشاري', 'PDC'],
+      ['حالة المشروع', 'جاري']
+    ];
+
+    const keyDeliveryProjectNames = {
+      'abu-ajram': 'مشروع هوائي أبو عجرم',
+      'fire-station': 'مشروع إنشاء محطة الحريق',
+      'diwan-cables': 'مشروع استبدال كابلات الديوان 132 كيلوفولت'
+    };
+
+    const projectPdfFiles = new Map();
+
+    const numberConfirmation = document.getElementById('numberConfirmation');
+    const confirmNumberYes = document.getElementById('confirmNumberYes');
+    const confirmNumberNo = document.getElementById('confirmNumberNo');
+    let pendingNumberCell = null;
+    let approvedNumberCell = null;
+
+    function askBeforeChangingNumber(cell){
+      pendingNumberCell = cell;
+      numberConfirmation.classList.add('is-open');
+      confirmNumberYes.focus();
+    }
+
+    confirmNumberYes.addEventListener('click', () => {
+      const cell = pendingNumberCell;
+      numberConfirmation.classList.remove('is-open');
+      pendingNumberCell = null;
+      if (!cell) return;
+      approvedNumberCell = cell;
+      cell.focus();
+    });
+
+    confirmNumberNo.addEventListener('click', () => {
+      const cell = pendingNumberCell;
+      numberConfirmation.classList.remove('is-open');
+      pendingNumberCell = null;
+      approvedNumberCell = null;
+      cell?.blur();
+    });
+
+    function getTableRows(detailId){
+      const savedRows = localStorage.getItem(`contractRows-${detailId}`);
+      if (!savedRows) return contractRows;
+      try {
+        return JSON.parse(savedRows);
+      } catch {
+        localStorage.removeItem(`contractRows-${detailId}`);
+        return contractRows;
+      }
+    }
+
+    function saveTableRows(detailId, table){
+      const rows = [...table.querySelectorAll('tbody.contract-data-body tr')].map(row =>
+        [...row.querySelectorAll('td')].map(cell => cell.textContent.trim())
+      );
+      localStorage.setItem(`contractRows-${detailId}`, JSON.stringify(rows));
+    }
+
+    function getKeyDeliveryRows(detailId){
+      const savedRows = localStorage.getItem(`keyDeliveryRows-${detailId}`);
+      if (!savedRows) return keyDeliveryRows;
+      try {
+        const rows = JSON.parse(savedRows);
+        // تحديث ترتيب النسخة السابقة: رقم العقد أولاً ثم رقم المنافسة.
+        if (rows[0]?.[1] === 'رقم المنافسة' && rows[1]?.[1] === 'رقم العقد') {
+          [rows[0], rows[1]] = [rows[1], rows[0]];
+        }
+        // حذف صفوف بيانات المشروع من النسخ السابقة؛ تُعرض الآن في بداية الجدول.
+        const projectInfoLabels = new Set([...keyDeliveryProjectInfoRows.map(row => row[0]), 'المعوقات']);
+        const cleanRows = rows.filter(row => !projectInfoLabels.has(row[1]));
+        if (!cleanRows.some(row => row[0] === '12' && row[1] === 'المعوقات')) {
+          cleanRows.push(['12', 'المعوقات', '', '']);
+        }
+        localStorage.setItem(`keyDeliveryRows-${detailId}`, JSON.stringify(cleanRows));
+        return cleanRows;
+      } catch {
+        localStorage.removeItem(`keyDeliveryRows-${detailId}`);
+        return keyDeliveryRows;
+      }
+    }
+
+    function saveKeyDeliveryRows(detailId, table){
+      const rows = [...table.querySelectorAll('tbody.key-data-body tr')].map(row =>
+        [...row.querySelectorAll('td')].map(cell => cell.textContent.trim())
+      );
+      localStorage.setItem(`keyDeliveryRows-${detailId}`, JSON.stringify(rows));
+    }
+
+    function getProjectInfoRows(detailId){
+      const savedRows = localStorage.getItem(`projectInfoRows-${detailId}`);
+      if (!savedRows) return keyDeliveryProjectInfoRows;
+      try {
+        const values = JSON.parse(savedRows);
+        return keyDeliveryProjectInfoRows.map(([label, defaultValue], index) => [label, values[index] ?? defaultValue]);
+      } catch {
+        localStorage.removeItem(`projectInfoRows-${detailId}`);
+        return keyDeliveryProjectInfoRows;
+      }
+    }
+
+    function saveProjectInfoRows(detailId, table){
+      const values = [...table.querySelectorAll('.project-info-value')]
+        .map(cell => cell.textContent.trim());
+      localStorage.setItem(`projectInfoRows-${detailId}`, JSON.stringify(values));
+    }
+
+    function projectInfoRowsHtml(columnCount, detailId){
+      const infoRows = getProjectInfoRows(detailId);
+      return `
+        <tbody class="project-info-body">
+          ${infoRows.map(([label, value], index) => `
+            <tr class="project-info-row">
+              <td colspan="${Math.floor(columnCount / 2)}">${label}</td>
+              <td class="project-info-value" data-project-info-index="${index}" colspan="${Math.ceil(columnCount / 2)}" contenteditable="true">${value}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
+    }
+
+    function parseTableNumber(value){
+      const normalized = String(value)
+        .replace(/,/g, '')
+        .replace(/\s/g, '')
+        .replace(/[^0-9.-]/g, '');
+      const number = Number(normalized);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function formatTableNumber(value, fractionDigits = 0){
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+      }).format(value);
+    }
+
+    function formatNumberCell(cell){
+      const easternArabicDigits = '٠١٢٣٤٥٦٧٨٩';
+      const raw = cell.textContent.trim()
+        .replace(/[٠-٩]/g, digit => easternArabicDigits.indexOf(digit))
+        .replace(/,/g, '');
+      if (!/^-?\d+(\.\d+)?$/.test(raw)) return;
+      const fractionDigits = raw.includes('.') ? raw.split('.')[1].length : 0;
+      cell.textContent = formatTableNumber(Number(raw), fractionDigits);
+    }
+
+    function formatNumericCells(table){
+      table.querySelectorAll('td.number, td.amount').forEach(formatNumberCell);
+    }
+
+    function projectAttachmentsHtml(projectId){
+      return `
+        <div class="project-attachments" data-pdf-project="${projectId}">
+          <h4>مرفقات PDF</h4>
+          <label class="pdf-upload-label">
+            <input type="file" accept="application/pdf,.pdf" multiple />
+            إضافة مرفقات PDF
+          </label>
+          <div class="pdf-list"></div>
+        </div>
+      `;
+    }
+
+    function setupProjectAttachments(container, projectId){
+      const attachments = container.querySelector(`[data-pdf-project="${projectId}"]`);
+      const input = attachments.querySelector('input[type="file"]');
+      const list = attachments.querySelector('.pdf-list');
+      const files = projectPdfFiles.get(projectId) || [];
+      projectPdfFiles.set(projectId, files);
+
+      const renderFiles = () => {
+        list.textContent = '';
+        files.forEach((file, index) => {
+          const preview = document.createElement('div');
+          preview.className = 'pdf-preview';
+          const head = document.createElement('div');
+          head.className = 'pdf-preview__head';
+          const name = document.createElement('span');
+          name.textContent = file.name;
+          const remove = document.createElement('button');
+          remove.type = 'button';
+          remove.textContent = 'حذف المرفق';
+          remove.addEventListener('click', () => {
+            URL.revokeObjectURL(file.url);
+            files.splice(index, 1);
+            renderFiles();
+          });
+          const viewer = document.createElement('embed');
+          viewer.src = file.url;
+          viewer.type = 'application/pdf';
+          head.append(name, remove);
+          preview.append(head, viewer);
+          list.append(preview);
+        });
+      };
+
+      input.addEventListener('change', () => {
+        [...input.files].forEach(file => {
+          if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) {
+            files.push({ name: file.name, url: URL.createObjectURL(file) });
+          }
+        });
+        input.value = '';
+        renderFiles();
+      });
+      renderFiles();
+    }
+
+    // صف الإجمالي يجمع القيم الموجودة في الصفوف فقط ولا يغيّرها.
+    function updateTableTotals(table){
+      const rows = [...table.querySelectorAll('tbody.contract-data-body tr')];
+      const dataRows = rows.slice(0, -1);
+      const totalCells = rows.at(-1)?.querySelectorAll('td');
+      if (!totalCells) return;
+
+      const sumColumn = (columnIndex) => dataRows.reduce(
+        (sum, row) => sum + parseTableNumber(row.cells[columnIndex].textContent),
+        0
+      );
+
+      totalCells[2].textContent = formatTableNumber(sumColumn(2));
+      totalCells[3].textContent = formatTableNumber(sumColumn(3), 2);
+      totalCells[4].textContent = formatTableNumber(sumColumn(4));
+      totalCells[5].textContent = formatTableNumber(sumColumn(5), 2);
+    }
+
+    function renderContractTable(detailId, container){
+      const rows = getTableRows(detailId);
+      container.innerHTML = `
+        <div class="contract-details">
+          <h3>تفاصيل إدارة العقد الموحد - ${projectNames[detailId]}</h3>
+          <div class="table-wrap">
+            <table class="contract-table" aria-label="جدول تفاصيل إدارة العقد الموحد">
+              <thead>
+                <tr>
+                  <th rowspan="2">م</th>
+                  <th rowspan="2">الوصف</th>
+                  <th colspan="2">عقد 2021</th>
+                  <th colspan="2">عقد 2026</th>
+                  <th rowspan="2">الملاحظات</th>
+                </tr>
+                <tr>
+                  <th>العدد</th>
+                  <th>القيمة</th>
+                  <th>العدد</th>
+                  <th>القيمة</th>
+                </tr>
+              </thead>
+              ${projectInfoRowsHtml(7, `contract-${detailId}`)}
+              <tbody class="contract-data-body">
+                ${rows.map((row, index) => `
+                  <tr class="${index === rows.length - 1 ? 'total' : ''}">
+                    <td class="serial" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[0]}</td>
+                    <td class="description" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[1]}</td>
+                    <td class="number" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[2]}</td>
+                    <td class="amount" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[3]}</td>
+                    <td class="number" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[4]}</td>
+                    <td class="amount" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[5]}</td>
+                    <td class="notes" contenteditable="${index === rows.length - 1 ? 'false' : 'true'}">${row[6]}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ${projectAttachmentsHtml(`contract-${detailId}`)}
+        </div>
+      `;
+      const table = container.querySelector('.contract-table');
+      setupProjectAttachments(container, `contract-${detailId}`);
+      updateTableTotals(table);
+      formatNumericCells(table);
+      table.addEventListener('focusout', (event) => {
+        if (event.target.matches('td.number, td.amount')) formatNumberCell(event.target);
+        if (event.target === approvedNumberCell) approvedNumberCell = null;
+      });
+      table.addEventListener('input', (event) => {
+        if (event.target.matches('.project-info-value')) {
+          saveProjectInfoRows(`contract-${detailId}`, table);
+          return;
+        }
+        if (event.target.closest('.total')) return;
+        updateTableTotals(table);
+        saveTableRows(detailId, table);
+      });
+    }
+
+    function renderKeyDeliveryTable(detailId, container){
+      const rows = getKeyDeliveryRows(detailId);
+      const numericValueRows = new Set([2, 7, 8, 9]);
+      container.innerHTML = `
+        <div class="contract-details">
+          <h3>تفاصيل ${keyDeliveryProjectNames[detailId]}</h3>
+          <div class="table-wrap">
+            <table class="contract-table key-table" aria-label="جدول تفاصيل تسليم المفتاح">
+              <thead>
+                <tr>
+                  <th>م</th>
+                  <th>الوصف</th>
+                  <th>القيمة أو البيان</th>
+                  <th>ملاحظات</th>
+                </tr>
+              </thead>
+              ${projectInfoRowsHtml(4, `key-${detailId}`)}
+              <tbody class="key-data-body">
+                ${rows.map((row, index) => `
+                  <tr>
+                    <td class="serial" contenteditable="true">${row[0] || ''}</td>
+                    <td class="description" contenteditable="true">${row[1] || ''}</td>
+                    <td class="value ${numericValueRows.has(index) ? 'amount' : ''}" contenteditable="true">${row[0] === '2' ? String(row[2] || '').replace(/,/g, '') : row[2] || ''}</td>
+                    <td class="notes" contenteditable="true">${row[3] || ''}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          ${projectAttachmentsHtml(`key-${detailId}`)}
+        </div>
+      `;
+
+      const table = container.querySelector('.key-table');
+      setupProjectAttachments(container, `key-${detailId}`);
+      formatNumericCells(table);
+      table.addEventListener('focusout', (event) => {
+        if (event.target.matches('td.number, td.amount')) formatNumberCell(event.target);
+        if (event.target === approvedNumberCell) approvedNumberCell = null;
+      });
+      table.addEventListener('input', (event) => {
+        if (event.target.matches('.project-info-value')) {
+          saveProjectInfoRows(`key-${detailId}`, table);
+          return;
+        }
+        saveKeyDeliveryRows(detailId, table);
+      });
+    }
+
+    document.querySelectorAll('.details[data-detail]').forEach(link => {
+      const detailId = link.dataset.detail;
+      const container = document.querySelector(`[data-contract-detail="${detailId}"]`);
+      if (!container) return;
+
+      renderContractTable(detailId, container);
+
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.project-details.is-open').forEach(panel => {
+          if (panel !== container) panel.classList.remove('is-open');
+        });
+        document.querySelectorAll('.details[data-detail]').forEach(detailLink => {
+          if (detailLink !== link) detailLink.textContent = 'تفاصيل المشروع';
+        });
+        const isOpen = container.classList.toggle('is-open');
+        link.textContent = isOpen ? 'إخفاء التفاصيل' : 'تفاصيل المشروع';
+      });
+    });
+
+    document.querySelectorAll('.details[data-key-detail]').forEach(link => {
+      const detailId = link.dataset.keyDetail;
+      const container = document.querySelector(`[data-key-project-detail="${detailId}"]`);
+      if (!container) return;
+
+      renderKeyDeliveryTable(detailId, container);
+
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.project-details.is-open').forEach(panel => {
+          if (panel !== container) panel.classList.remove('is-open');
+        });
+        document.querySelectorAll('.details[data-key-detail]').forEach(detailLink => {
+          if (detailLink !== link) detailLink.textContent = 'تفاصيل المشروع';
+        });
+        const isOpen = container.classList.toggle('is-open');
+        link.textContent = isOpen ? 'إخفاء التفاصيل' : 'تفاصيل المشروع';
+      });
+    });
+
+    document.querySelectorAll('.special-project-name').forEach(name => {
+      const storageKey = `specialProjectName-${name.dataset.specialProject}`;
+      const savedName = localStorage.getItem(storageKey);
+      if (savedName) name.textContent = savedName;
+      name.addEventListener('input', () => {
+        localStorage.setItem(storageKey, name.textContent.trim());
+      });
+    });
+    
+    document.querySelectorAll('a[href="#"]:not(.details[data-detail])').forEach(link => {
+      link.addEventListener('click', (e) => e.preventDefault());
+    });
+  </script>
+</body>
+</html>
